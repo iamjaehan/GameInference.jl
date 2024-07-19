@@ -35,7 +35,6 @@ StatsPlots = "f3b207a7-027a-5e70-b257-86293d7955fd"
 iLQGames = "ae812560-bd7e-11e9-3bd3-b502f7cff3d3"
 
 [compat]
-julia = "1.3"
 BenchmarkTools = "0.5"
 CSV = "0.6"
 Clustering = "0.13"

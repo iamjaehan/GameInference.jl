@@ -109,6 +109,7 @@ function run_simulation(x0, solver, d_eval, d_ego, eval_controller, ego_controll
     # abusing GR as a gui for real time plotting
     Δt_frame= 0.1
     t_last = time()
+    println("TEST4")
     for k in 1:n_clsteps
         # extract the control input that each player will take
         u_ego = control(ego_controller, model, ego_planning_state)

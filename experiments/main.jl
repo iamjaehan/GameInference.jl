@@ -180,6 +180,9 @@ end
 function plot_example_trajectory(problem_data=setup_problem(3); seed_id=1)
     (seed, game_instance) = rand(MersenneTwister(seed_id), problem_data.d_eval)
     _, op, γ = solve(seed, game_instance, problem_data.solver, problem_data.x0)
+    println(game_instance)
+    global probTest = problem_data
+    global optest = op
     return plot_traj(op, game_instance, GameInference.nominal_player_colors, nothing,
                      (size=(300,300), xlims=(-3.5, 3.5), ylims=(-3.5, 3.5)); kp=50)
 end
@@ -203,10 +206,8 @@ experiment_setups_uneq = [
                           setup_experiment(PredictionExperiment(), setup_problem(3),
                                            approaches_uneq),
                           setup_experiment(PlanningExperiment(), setup_problem(3),
-                                           approaches_uneq),
-                          setup_experiment(PlanningExperiment(), setup_problem(5),
                                            approaches_uneq;
-                                           run_kwargs=(n_particles=150,)),
+                                           run_kwargs=(n_particles=40,)),
                          ]
 
 function generate_plots_uneq(datadir=datadir_uneq)
