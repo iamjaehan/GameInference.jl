@@ -109,7 +109,6 @@ function run_simulation(x0, solver, d_eval, d_ego, eval_controller, ego_controll
     # abusing GR as a gui for real time plotting
     Δt_frame= 0.1
     t_last = time()
-    println("TEST4")
     for k in 1:n_clsteps
         # extract the control input that each player will take
         u_ego = control(ego_controller, model, ego_planning_state)
@@ -132,6 +131,7 @@ function run_simulation(x0, solver, d_eval, d_ego, eval_controller, ego_controll
 
         # belief update if anyone is using it
         uses_belief = any(c isa MAPController for c in (ego_controller, eval_controller))
+        println(uses_belief)
         if uses_belief
             b_ego = update(pf, b_ego, 0.0, o)
             merge_similar!(b_ego, 0.1)
