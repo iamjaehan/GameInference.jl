@@ -3,7 +3,7 @@
 function initial_belief(rng::AbstractRNG, d, x0, n_particles)
 
     # a system trajectory that consists of all x0 states and zero input
-    x0_op = zero(SystemTrajectory, nominal_game(d))
+    x0_op = zero(SystemTrajectory, nominal_game(d)) # 지점 리스트 생성
     fill!(x0_op.x, x0)
     s0, g0 = rand(rng, d)
 
@@ -72,7 +72,7 @@ function run_simulation(x0, solver, d_eval, d_ego, eval_controller, ego_controll
     b_ego = initial_belief(rng, d_ego, x0, n_particles)
 
     # sample the sevaluation player
-    eval_planning_state = initial_planning_state(eval_controller, b_eval, rng)
+    eval_planning_state = initial_planning_state(eval_controller, b_eval, rng) # MAP이면 b 그대로 뱉음. Fixed면 b에서 랜덤으로 추출 & 향후 유지됨 by function control.
     ego_planning_state = initial_planning_state(ego_controller, b_ego, rng)
     true_game = game_instance(eval_planning_state)
 
@@ -84,7 +84,7 @@ function run_simulation(x0, solver, d_eval, d_ego, eval_controller, ego_controll
     # Given the dynamics and observation model, we can construct the particle filter
     # model.
     snm = (x, rng) -> x
-    om = infer_only ? identity : x -> x[(last(first(xids))+1):end]
+    om = infer_only ? identity : x -> x[(last(first(xids))+1):end] #observation : state를 전송함.
     S = Random.gentype(b_ego); A = Float64; O = typeof(x0);
     model = GameSolutionModel{S, A, O}(solver, om)
 
@@ -131,9 +131,8 @@ function run_simulation(x0, solver, d_eval, d_ego, eval_controller, ego_controll
 
         # belief update if anyone is using it
         uses_belief = any(c isa MAPController for c in (ego_controller, eval_controller))
-        println(uses_belief)
         if uses_belief
-            b_ego = update(pf, b_ego, 0.0, o)
+            b_ego = update(pf, b_ego, 0.0, o) # 정보: particle vector, old belief, action, observation
             merge_similar!(b_ego, 0.1)
             update_external!(b_ego, xₖ)
         end
@@ -193,7 +192,7 @@ function run_simulation(x0, solver, d_eval, d_ego, eval_controller, ego_controll
                     p = plot(plt_traj, size=(400,400))
                 end
                 if save_fig_only
-                    savefig(p, "$(save_fig_path)/sim-$(lpad(k, 3, "0")).pdf")
+                    savefig(p, "$(save_fig_path)/sim-$(lpad(k, 3, "0")).png")
                 else
                     display(p)
                 end
