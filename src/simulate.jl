@@ -61,6 +61,12 @@ function update_planning_state(c::FixedSeedController, gss, b, x, model,
     gss = POMDPs.gen(model, gss, 0., rng).sp
     return update_external!(gss, x)
 end
+function get_true_game(c::FixedSeedController, b, rng)
+    return game_instance(b)
+end
+function get_true_game(c::MAPController, b, rng)
+    return game_instance(statelabel(rand(rng, b)))
+end
 
 "-------------------------------- Simulation Method -------------------------------"
 
@@ -74,7 +80,7 @@ function run_simulation(x0, solver, d_eval, d_ego, eval_controller, ego_controll
     # sample the sevaluation player
     eval_planning_state = initial_planning_state(eval_controller, b_eval, rng) # MAP이면 b 그대로 뱉음. Fixed면 b에서 랜덤으로 추출 & 향후 유지됨 by function control.
     ego_planning_state = initial_planning_state(ego_controller, b_ego, rng)
-    true_game = game_instance(eval_planning_state)
+    true_game = get_true_game(eval_controller, eval_planning_state, rng)
 
     zero_op = zero(SystemTrajectory, true_game)
     nu = n_controls(true_game)
@@ -174,7 +180,7 @@ function run_simulation(x0, solver, d_eval, d_ego, eval_controller, ego_controll
 
             save_fig_only = !isnothing(save_fig_path)
 
-            if k % 10 == 1 || !save_fig_only
+            if k % 3 == 1 || !save_fig_only
                 if uses_belief
                     # plot belief hisotgram
                     plt_hist = histogram([p.id for p in particles(b_ego)],
