@@ -1,3 +1,4 @@
 *.so
 pandoc-compose.yaml
 out.html
+*.png
