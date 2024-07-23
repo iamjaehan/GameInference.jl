@@ -69,4 +69,5 @@ module GameInference
     include("distributions.jl")
     include("inference.jl")
     include("simulate.jl")
+    include("../experiments/main.jl")
 end # module

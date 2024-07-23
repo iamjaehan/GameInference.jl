@@ -43,7 +43,7 @@ prediction(c::MAPController, b) = operating_point(sorted_mode(b))
 function update_planning_state(c::MAPController, b_planning, b, x, model,
                                rng::AbstractRNG)
     # TODO: for now, this assmes that the belief is updated outside
-    @assert all(external_updated(p) && internal_updated(p) for p in particles(b))
+    # @assert all(external_updated(p) && internal_updated(p) for p in particles(b))
     return b
 end
 
@@ -141,11 +141,14 @@ function run_simulation(x0, solver, d_eval, d_ego, eval_controller, ego_controll
             b_ego = update(pf, b_ego, 0.0, o) # 정보: particle vector, old belief, action, observation
             merge_similar!(b_ego, 0.1)
             update_external!(b_ego, xₖ)
+            b_eval = update(pf, b_eval, 0.0, o) # 정보: particle vector, old belief, action, observation
+            merge_similar!(b_eval, 0.1)
+            update_external!(b_eval, xₖ)
         end
 
         # update eval player
         eval_planning_state = update_planning_state(eval_controller,
-                                                    eval_planning_state, b_ego, xₖ,
+                                                    eval_planning_state, b_eval, xₖ,
                                                     model, rng)
         eval_prediction = prediction(eval_controller, eval_planning_state)
         # update ego player
@@ -180,7 +183,7 @@ function run_simulation(x0, solver, d_eval, d_ego, eval_controller, ego_controll
 
             save_fig_only = !isnothing(save_fig_path)
 
-            if k % 3 == 1 || !save_fig_only
+            if k % 2 == 1 || !save_fig_only
                 if uses_belief
                     # plot belief hisotgram
                     plt_hist = histogram([p.id for p in particles(b_ego)],

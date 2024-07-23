@@ -1,4 +1,4 @@
-np = 5
+np = 3
 rng = MersenneTwister(1)
 tempDir = joinpath(@__DIR__, "../results/test")
 problemTest = setup_problem(np)
@@ -12,11 +12,13 @@ problemTest = setup_problem(np)
 uids = uindex(nominal_game(problemTest.d_eval))
 uid_ego = first(uids)
 uid_eval = vcat(uids[2:end]...)
-ego_controller = MAPController{uid_ego}()
-eval_controller = MAPController{uid_eval}()
+# ego_controller = MAPController{uid_ego}()
+# eval_controller = MAPController{uid_eval}()
+ego_controller = MAPController{@S(1:n_controls(nominal_game(problemTest.d_eval)))}()
+eval_controller = MAPController{nothing}()
 
 traj_cl, ego_prediction, true_game = run_simulation(problemTest..., eval_controller, ego_controller, rng; n_particles=60, 
-infer_only=true, visualize=true, save_fig_path=tempDir)
+infer_only=true, visualize=true, save_fig_path=nothing)
 
 global out_traj_cl = traj_cl
 global out_ego_prediction = ego_prediction
